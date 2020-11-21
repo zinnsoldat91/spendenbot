@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import r.austria.Donation;
@@ -80,6 +81,15 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
         return builder.build();
     }
 
+    @Override
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        String content = event.getMessage().getContentRaw();
+        if (content.equalsIgnoreCase("!spenden")) {
+            if (totalDonationSource != null && totalDonationSource.getTotalAmount() != null) {
+                event.getTextChannel().sendMessage("Aktuell wurden **" + this.totalDonationSource.getTotalAmount() + " Euro** für Debra Austria gespendet. Spende auch du unter https://tiny.cc/schmetterling2020").submit();
+            }
+        }
+    }
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
