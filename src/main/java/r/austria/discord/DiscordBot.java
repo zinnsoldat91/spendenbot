@@ -77,7 +77,7 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
         }
         builder.setDescription(donation.getMessage());
         builder.setTitle(String.format(":bell: %s hat %.2f Euro gespendet :bell:", donation.getDonator(), donation.getAmount()));
-        builder.setFooter("Spende auch du für Debra Austria unter https://tinyurl.cc/schmetterling2020", footerImage);
+        builder.setFooter("Spende auch du für Debra Austria unter http://tiny.cc/schmetterling2020", footerImage);
         return builder.build();
     }
 
