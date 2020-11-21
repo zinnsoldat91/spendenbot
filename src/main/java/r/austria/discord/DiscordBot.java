@@ -9,11 +9,12 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import r.austria.Donation;
+import r.austria.DonationListener;
 
 import javax.security.auth.login.LoginException;
 import java.util.logging.Logger;
 
-public class DiscordBot extends ListenerAdapter {
+public class DiscordBot extends ListenerAdapter implements DonationListener {
 
     private final static Logger LOG = Logger.getLogger(DiscordBot.class.getName());
 
@@ -21,12 +22,17 @@ public class DiscordBot extends ListenerAdapter {
     private final JDA discordApi;
 
     public DiscordBot() throws LoginException {
-        discordApi = JDABuilder.createDefault("Nzc4MzE1MTEwMTgyNTUxNjIz.X7QMbg.LAmOcYJ54B8lxYpt1vx-QCaennI")
+        discordApi = JDABuilder.createDefault("Nzc4MzE1MTEwMTgyNTUxNjIz.X7QMbg.AUgkM--c0GuNNQIQ4h_kiU4DI64")
                 .addEventListeners(this)
                 .build();
     }
 
-    public void sendDonationMessage(Donation donation) {
+    @Override
+    public void onDonationReceived(Donation donation) {
+        sendDonationMessage(donation);
+    }
+
+    private void sendDonationMessage(Donation donation) {
         if (ready) {
             LOG.info(String.format("Sending discord message for donation %s", donation));
             discordApi.getGuildById("778314765310361622").getTextChannelById("778314765310361625")
