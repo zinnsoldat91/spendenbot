@@ -10,8 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import r.austria.Donation;
 import r.austria.DonationListener;
-import r.austria.debra.DonationSource;
-import r.austria.debra.MockDebraSource;
+import r.austria.debra.TotalDonationSource;
 
 import javax.security.auth.login.LoginException;
 import java.util.logging.Logger;
@@ -23,10 +22,10 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
 
     private boolean ready = false;
     private final JDA discordApi;
-    private DonationSource donationSource = new MockDebraSource();
+    private TotalDonationSource totalDonationSource;
 
     public DiscordBot() throws LoginException {
-        discordApi = JDABuilder.createDefault("Nzc4MzE1MTEwMTgyNTUxNjIz.X7QMbg.AUgkM--c0GuNNQIQ4h_kiU4DI64")
+        discordApi = JDABuilder.createDefault("Nzc4MzE1MTEwMTgyNTUxNjIz.X7QMbg.3ICCWx1QQgILndKQZYGzb85b4BM")
                 .addEventListeners(this)
                 .build();
     }
@@ -47,10 +46,15 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
         }
     }
 
+    public void setTotalDonationSource(TotalDonationSource totalDonationSource) {
+        this.totalDonationSource = totalDonationSource;
+    }
+
     private MessageEmbed buildEmbed(Donation donation) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.addField("Aktueller Spendenbetrag", donationSource.getTotalDonations().getTotalAmount().toString(), true);
-        builder.addField("Anzahl Spenden", Integer.toString(donationSource.getTotalDonations().getNumberOfDonations()), true);
+        if (totalDonationSource != null && totalDonationSource.getTotalAmount() != null) {
+            builder.addField("Aktueller Spendenbetrag", totalDonationSource.getTotalAmount().toString(), true);
+        }
         builder.setDescription(donation.getMessage());
         builder.setTitle(String.format(":bell: %s hat %.2f Euro gespendet :bell:", donation.getDonator(), donation.getAmount()));
         builder.setFooter("Spende auch du für Debra Austria unter https://tinyurl.cc/schmetterling2020", footerImage);
