@@ -51,6 +51,7 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
         builder.addField("Aktueller Spendenbetrag", donationSource.getTotalDonations().getTotalAmount().toString(), true);
         builder.addField("Anzahl Spenden", Integer.toString(donationSource.getTotalDonations().getNumberOfDonations()), true);
         builder.setDescription(donation.getMessage());
+        builder.setImage("https://raw.githubusercontent.com/zinnsoldat91/spendenbot/main/src/main/resources/images/embed_logo.png");
         builder.setTitle(String.format(":bell: %s hat %.2f Euro gespendet :bell:", donation.getDonator(), donation.getAmount()));
         builder.setFooter("Spende auch du für Debra Austria unter https://tinyurl.cc/schmetterling2020");
         return builder.build();
