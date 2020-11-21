@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import r.austria.Donation;
 import r.austria.DonationListener;
+import r.austria.debra.DonationSource;
+import r.austria.debra.MockDebraSource;
 
 import javax.security.auth.login.LoginException;
 import java.util.logging.Logger;
@@ -20,6 +22,7 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
 
     private boolean ready = false;
     private final JDA discordApi;
+    private DonationSource donationSource = new MockDebraSource();
 
     public DiscordBot() throws LoginException {
         discordApi = JDABuilder.createDefault("Nzc4MzE1MTEwMTgyNTUxNjIz.X7QMbg.AUgkM--c0GuNNQIQ4h_kiU4DI64")
@@ -45,11 +48,11 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
 
     private MessageEmbed buildEmbed(Donation donation) {
         EmbedBuilder builder = new EmbedBuilder();
-        builder.addField("Spender", donation.getDonator(), true);
-        builder.addField("Betrag", donation.getAmount().toString(), true);
+        builder.addField("Aktueller Spendenbetrag", donationSource.getTotalDonations().getTotalAmount().toString(), true);
+        builder.addField("Anzahl Spenden", Integer.toString(donationSource.getTotalDonations().getNumberOfDonations()), true);
         builder.setDescription(donation.getMessage());
-        builder.setTitle("Parteispendenalarm!");
-        builder.setFooter("Spende auch du unter https://tinyurl.cc/schmetterling2020");
+        builder.setTitle(String.format(":bell: %s hat %.2f Euro gespendet :bell:", donation.getDonator(), donation.getAmount()));
+        builder.setFooter("Spende auch du für Debra Austria unter https://tinyurl.cc/schmetterling2020");
         return builder.build();
     }
 

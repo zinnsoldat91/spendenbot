@@ -21,6 +21,12 @@ public class Donation {
         }
     }
 
+    public Donation(String donator, BigDecimal amount, String message) {
+        this.donator = donator;
+        this.amount = amount;
+        this.message = message;
+    }
+
     private final String donator;
     private final BigDecimal amount;
     private final String message;
