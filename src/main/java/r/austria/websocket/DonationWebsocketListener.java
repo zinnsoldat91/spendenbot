@@ -1,22 +1,24 @@
-package r.austria;
+package r.austria.websocket;
 
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import r.austria.discord.DiscordBot;
+import r.austria.Donation;
 
 import javax.security.auth.login.LoginException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class IncomingDonationListener extends WebSocketListener {
+public class DonationWebsocketListener extends WebSocketListener {
 
-    private static final Logger LOG = Logger.getLogger(IncomingDonationListener.class.getName());
+    private static final Logger LOG = Logger.getLogger(DonationWebsocketListener.class.getName());
     private final DiscordBot discordBot;
     private boolean connected;
     private WebSocket webSocket;
     private String url;
 
 
-    public IncomingDonationListener(String url) throws LoginException {
+    public DonationWebsocketListener(String url) throws LoginException {
 
         this.url = url;
         this.webSocket = createWebsocketConnection();
