@@ -72,7 +72,7 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
     private MessageEmbed buildEmbed(Donation donation) {
         EmbedBuilder builder = new EmbedBuilder();
         if (totalDonationSource != null && totalDonationSource.getTotalAmount() != null) {
-            builder.addField("Aktueller Spendenbetrag", totalDonationSource.getTotalAmount().toString(), true);
+            builder.addField("Aktueller Spendenbetrag", totalDonationSource.getTotalAmount().toString() + " Euro", true);
         }
         builder.setDescription(donation.getMessage());
         builder.setTitle(String.format(":bell: %s hat %.2f Euro gespendet :bell:", donation.getDonator(), donation.getAmount()));
