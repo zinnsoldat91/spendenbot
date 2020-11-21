@@ -13,7 +13,12 @@ import r.austria.DonationListener;
 import r.austria.debra.TotalDonationSource;
 
 import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class DiscordBot extends ListenerAdapter implements DonationListener {
 
@@ -24,10 +29,20 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
     private final JDA discordApi;
     private TotalDonationSource totalDonationSource;
 
+    private final String guildId;
+    private final List<String> channelIds;
+
     public DiscordBot() throws LoginException {
-        discordApi = JDABuilder.createDefault("Nzc4MzE1MTEwMTgyNTUxNjIz.X7QMbg.3ICCWx1QQgILndKQZYGzb85b4BM")
+        discordApi = JDABuilder.createDefault(System.getenv("DISCORD_TOKEN"))
                 .addEventListeners(this)
                 .build();
+        this.guildId = Objects.requireNonNull(System.getenv("DISCORD_GUILD_ID"));
+        channelIds = fetchChannelIds();
+    }
+
+    private List<String> fetchChannelIds() {
+        final String commaSeparatedIds = System.getenv("DISCORD_CHANNEL_IDS");
+        return Arrays.stream(commaSeparatedIds.split(",")).map(String::trim).collect(Collectors.toList());
     }
 
     @Override
@@ -37,14 +52,18 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
 
     private void sendDonationMessage(Donation donation) {
         if (ready) {
-            LOG.info(String.format("Sending discord message for donation %s", donation));
-            discordApi.getGuildById("778314765310361622").getTextChannelById("778314765310361625")
-                    .sendMessage(buildEmbed(donation))
-                    .submit();
+            MessageEmbed message = buildEmbed(donation);
+            for (String channel : channelIds) {
+                LOG.info(String.format("Sending discord message for donation %s", donation));
+                discordApi.getGuildById(guildId).getTextChannelById(channel)
+                        .sendMessage(message)
+                        .submit();
+            }
         } else {
             LOG.warning("Discord API not ready, could not send message.");
         }
     }
+
 
     public void setTotalDonationSource(TotalDonationSource totalDonationSource) {
         this.totalDonationSource = totalDonationSource;
