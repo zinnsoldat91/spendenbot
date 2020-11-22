@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ import r.austria.Donation;
 import r.austria.DonationListener;
 import r.austria.debra.TotalDonationSource;
 
+import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +28,6 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
     private final static Logger LOG = Logger.getLogger(DiscordBot.class.getName());
     private final static String footerImage = "https://raw.githubusercontent.com/zinnsoldat91/spendenbot/main/src/main/resources/images/embed_logo.png";
 
-    private boolean ready = false;
     private final JDA discordApi;
     private TotalDonationSource totalDonationSource;
 
@@ -52,7 +53,7 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
     }
 
     private void sendDonationMessage(Donation donation) {
-        if (ready) {
+        try {
             MessageEmbed message = buildEmbed(donation);
             for (String channel : channelIds) {
                 LOG.info(String.format("Sending discord message for donation %s", donation));
@@ -60,8 +61,8 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
                         .sendMessage(message)
                         .submit();
             }
-        } else {
-            LOG.warning("Discord API not ready, could not send message.");
+        } catch (Exception e) {
+            LOG.severe("Error while sending message: " + e.getMessage());
         }
     }
 
@@ -83,23 +84,15 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        String content = event.getMessage().getContentRaw();
-        if (content.equalsIgnoreCase("!spenden")) {
-            if (totalDonationSource != null && totalDonationSource.getTotalAmount() != null) {
-                event.getTextChannel().sendMessage("Aktuell wurden **" + this.totalDonationSource.getTotalAmount() + " Euro** für Debra Austria gespendet. Spende auch du unter https://tiny.cc/schmetterling2020").submit();
+        try {
+            String content = event.getMessage().getContentRaw();
+            if (content.equalsIgnoreCase("!spenden")) {
+                if (totalDonationSource != null && totalDonationSource.getTotalAmount() != null) {
+                    event.getTextChannel().sendMessage("Aktuell wurden **" + this.totalDonationSource.getTotalAmount() + " Euro** für Debra Austria gespendet. Spende auch du unter https://tiny.cc/schmetterling2020").submit();
+                }
             }
+        } catch (Exception e) {
+            LOG.severe("Error while sending message: " + e.getMessage());
         }
-    }
-
-    @Override
-    public void onReady(@NotNull ReadyEvent event) {
-        super.onReady(event);
-        ready = true;
-    }
-
-    @Override
-    public void onDisconnect(@NotNull DisconnectEvent event) {
-        super.onDisconnect(event);
-        ready = false;
     }
 }
