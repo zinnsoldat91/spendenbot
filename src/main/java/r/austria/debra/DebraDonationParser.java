@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DebraDonationParser implements TotalDonationSource, DonationListener {
+public class DebraDonationParser implements TotalDonationSource {
 
     private static final String AMOUNT_PATTERN = "var collected = '(.*)';";
     private static final Pattern PATTERN = Pattern.compile(AMOUNT_PATTERN);
@@ -24,29 +24,18 @@ public class DebraDonationParser implements TotalDonationSource, DonationListene
 
     private final String url;
 
-    private BigDecimal amount = null;
-    private LocalDateTime lastFetch = null;
 
     public DebraDonationParser(String url) {
         this.url = url;
-        getTotalAmount();
     }
 
     @Override
     public synchronized BigDecimal getTotalAmount() {
-
-        if (shouldFetch()) {
-            this.amount = fetchAmountFromHtml();
-            this.lastFetch = LocalDateTime.now();
-        }
-        return this.amount;
-    }
-
-    private boolean shouldFetch() {
-        return this.amount == null || this.lastFetch == null || lastFetch.isBefore(LocalDateTime.now().minusHours(1L));
+        return fetchAmountFromHtml();
     }
 
     private BigDecimal fetchAmountFromHtml() {
+        LOG.info(() -> "Fetching donatino amount from debra.");
         try (InputStream is = new URL(this.url).openStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
@@ -65,8 +54,4 @@ public class DebraDonationParser implements TotalDonationSource, DonationListene
         return null;
     }
 
-    @Override
-    public synchronized void onDonationReceived(Donation donation) {
-        this.amount = Optional.ofNullable(amount).orElse(new BigDecimal(0)).add(donation.getAmount());
-    }
 }

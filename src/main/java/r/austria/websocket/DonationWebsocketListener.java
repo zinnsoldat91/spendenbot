@@ -47,7 +47,6 @@ public class DonationWebsocketListener extends WebSocketListener {
     @Override
     public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
         LOG.info(String.format("Connected to %s", url));
-
     }
 
     @Override
