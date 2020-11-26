@@ -1,6 +1,7 @@
 package r.austria;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +16,7 @@ public class Donation {
             this.donator = matcher.group(1);
             String amountString = matcher.group(2);
             this.amount = new BigDecimal(amountString.replace(',', '.'));
-            this.message = matcher.group(3);
+            this.message = Optional.ofNullable(matcher.group(3)).map(msg -> msg.replaceAll("(<br>)+", " ")).map(String::trim).orElse("");
         } else {
             throw new IllegalArgumentException("String in Wrong format");
         }
