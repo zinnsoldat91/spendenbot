@@ -10,16 +10,16 @@ import net.dv8tion.jda.api.events.StatusChangeEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import r.austria.AmountFormatter;
 import r.austria.Donation;
 import r.austria.DonationListener;
 import r.austria.debra.TotalDonationSource;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -66,20 +66,26 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
         }
     }
 
-
     public void setTotalDonationSource(TotalDonationSource totalDonationSource) {
         this.totalDonationSource = totalDonationSource;
     }
 
     private MessageEmbed buildEmbed(Donation donation) {
         EmbedBuilder builder = new EmbedBuilder();
-        if (totalDonationSource != null && totalDonationSource.getTotalAmount() != null) {
-            builder.addField("Aktueller Spendenbetrag", totalDonationSource.getTotalAmount().toString() + " Euro", true);
+        if (totalDonationSource != null) {
+            BigDecimal totalAmount = totalDonationSource.getTotalAmount();
+            if (totalAmount != null) {
+                builder.addField("Aktueller Spendenbetrag", formatAmount(totalAmount) + " Euro", true);
+            }
         }
         builder.setDescription(donation.getMessage());
-        builder.setTitle(String.format(":bell: %s hat %.2f Euro gespendet :bell:", donation.getDonator(), donation.getAmount()));
+        builder.setTitle(String.format(":bell: %s hat %s Euro gespendet :bell:", donation.getDonator(), formatAmount(donation.getAmount())));
         builder.setFooter("Spende auch du für Debra Austria unter http://tiny.cc/schmetterling2020", footerImage);
         return builder.build();
+    }
+
+    private String formatAmount(BigDecimal amount) {
+        return new AmountFormatter(amount).getFormattedAmount();
     }
 
     @Override
@@ -87,8 +93,11 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
         try {
             String content = event.getMessage().getContentRaw();
             if (content.equalsIgnoreCase("!spenden")) {
-                if (totalDonationSource != null && totalDonationSource.getTotalAmount() != null) {
-                    event.getTextChannel().sendMessage("Aktuell wurden **" + this.totalDonationSource.getTotalAmount() + " Euro** für Debra Austria gespendet. Spende auch du unter https://tiny.cc/schmetterling2020").submit();
+                if (totalDonationSource != null) {
+                    BigDecimal totalAmount = totalDonationSource.getTotalAmount();
+                    if (totalAmount != null) {
+                        event.getTextChannel().sendMessage("Aktuell wurden **" + formatAmount(totalAmount) + " Euro** für Debra Austria gespendet. Spende auch du unter https://tiny.cc/schmetterling2020").submit();
+                    }
                 }
             }
         } catch (Exception e) {
