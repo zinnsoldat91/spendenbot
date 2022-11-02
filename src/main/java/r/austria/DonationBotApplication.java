@@ -12,7 +12,7 @@ public class DonationBotApplication {
         DonationWebsocketListener incomingDonationListener = new DonationWebsocketListener("ws://spenden.baba.fm:8765/");
 
         DiscordBot discordBot = new DiscordBot();
-        DebraDonationParser debraDonationParser = new DebraDonationParser("https://em.altruja.de/r-austria-fuer-debra-2020");
+        DebraDonationParser debraDonationParser = new DebraDonationParser("https://em.altruja.de/discord-und-r-austria-2021");
         discordBot.setTotalDonationSource(debraDonationParser);
 
         incomingDonationListener.addDonationListener(discordBot);

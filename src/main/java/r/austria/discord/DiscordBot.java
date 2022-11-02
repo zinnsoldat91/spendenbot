@@ -80,7 +80,7 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
         }
         builder.setDescription(donation.getMessage());
         builder.setTitle(String.format(":bell: %s hat %s Euro gespendet :bell:", donation.getDonator(), formatAmount(donation.getAmount())));
-        builder.setFooter("Spende auch du für Debra Austria unter http://tiny.cc/schmetterling2020", footerImage);
+        builder.setFooter("Spende auch du für Debra Austria unter http://tiny.cc/schmetterling2021", footerImage);
         return builder.build();
     }
 
@@ -96,7 +96,7 @@ public class DiscordBot extends ListenerAdapter implements DonationListener {
                 if (totalDonationSource != null) {
                     BigDecimal totalAmount = totalDonationSource.getTotalAmount();
                     if (totalAmount != null) {
-                        event.getTextChannel().sendMessage("Aktuell wurden **" + formatAmount(totalAmount) + " Euro** für Debra Austria gespendet. Spende auch du unter https://tiny.cc/schmetterling2020").submit();
+                        event.getTextChannel().sendMessage("Aktuell wurden **" + formatAmount(totalAmount) + " Euro** für Debra Austria gespendet. Spende auch du unter https://tiny.cc/schmetterling2021").submit();
                     }
                 }
             }
